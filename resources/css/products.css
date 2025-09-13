@@ -1,0 +1,7 @@
+select.select-custom {
+    -webkit-appearance: none; /* Safari/Chrome */
+    -moz-appearance: none;    /* Firefox */
+    appearance: none;         /* 標準 */
+    background: transparent;  /* デフォルト背景を消す */
+    padding-right: 1.5rem;    /* カスタム矢印用の余白 */
+}
