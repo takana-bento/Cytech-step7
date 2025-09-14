@@ -30,13 +30,13 @@
                     class="{{ $formInputClass }} flex-1"
                 >
 
-                <!-- 会社選択 -->
+                <!-- メーカー名選択 -->
                 <div class="relative flex-1">
                     <select
                         name="company_id"
                         class="{{ $formInputClass }} select-custom w-full border border-gray-400 rounded px-3 py-2 pr-8 appearance-none"
                     >
-                        <option value="">会社名</option>
+                        <option value="">メーカー名</option>
                         @foreach($companies as $company)
                             <option
                                 value="{{ $company->id }}" 
@@ -108,7 +108,7 @@
                                 </td>
 
                                 <!-- 商品名 -->
-                                <td class="px-1 py-5 product-name-cell">
+                                <td class="px-1 py-5 text-center product-name-cell">
                                     <span class="product-name-text">{{ $product->product_name }}</span>
                                 </td>
 
@@ -118,8 +118,10 @@
                                 <!-- 在庫数 -->
                                 <td class="px-1 py-5 text-center whitespace-nowrap">{{ $product->stock }}</td>
 
-                                <!-- 会社名 -->
-                                <td class="px-1 py-5 text-center whitespace-nowrap">{{ $product->company->company_name ?? '-' }}</td>
+                                <!-- メーカー名 -->
+                                <td class="px-1 py-5 text-center company-name-cell">
+                                    <span class="company-name-text">{{ $product->company->company_name ?? '-' }}</span>
+                                </td>
 
                                 <!-- 詳細・削除アクション -->
                                 <td class="px-1 py-5 text-center flex justify-center gap-3">

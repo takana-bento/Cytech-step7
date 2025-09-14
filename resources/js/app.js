@@ -1,14 +1,13 @@
 import './bootstrap';
-
 import Alpine from 'alpinejs';
-
 import '../css/products.css';
 
 window.Alpine = Alpine;
-
 Alpine.start();
 
 document.addEventListener("DOMContentLoaded", () => {
+
+    // --- 画像プレビュー ---
     const imageInput = document.getElementById("imageInput");
     const fileName = document.getElementById("fileName");
     const previewContainer = document.getElementById("previewContainer");
@@ -18,10 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
         imageInput.addEventListener("change", (event) => {
             const file = event.target.files[0];
             if (file) {
-                // ファイル名を表示
                 fileName.textContent = file.name;
-
-                // プレビューを表示
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     previewImage.src = e.target.result;
@@ -35,39 +31,36 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-});
 
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".product-name-text").forEach(el => {
-        const parentWidth = el.parentElement.offsetWidth;
-        let fontSize = 20; // 初期サイズ(px)
-        el.style.fontSize = fontSize + "px";
-
-        // 親幅を超えるならフォントサイズを縮小
-        while (el.scrollWidth > parentWidth && fontSize > 10) {
-            fontSize--;
+    // --- プロダクト名・メーカー名のフォント調整 ---
+    const adjustTextSize = (selector) => {
+        document.querySelectorAll(selector).forEach(el => {
+            const parentWidth = el.parentElement.clientWidth; // offsetWidthより安定
+            let fontSize = 20;
             el.style.fontSize = fontSize + "px";
-        }
-    });
-});
+    
+            while (el.scrollWidth > parentWidth && fontSize > 10) {
+                fontSize--;
+                el.style.fontSize = fontSize + "px";
+            }
+        });
+    };
+    
+    // 商品名とメーカー名の両方に適用
+    adjustTextSize(".product-name-text");
+    adjustTextSize(".company-name-text");
 
-// 全角数字を半角に変換する関数
-function toHalfWidth(str) {
-    return str.replace(/[０-９]/g, function(s) {
-        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
-    });
-}
+    // --- 全角数字を半角に変換 ---
+    const toHalfWidth = (str) => str.replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
 
-document.addEventListener("DOMContentLoaded", () => {
     const priceInput = document.querySelector("input[name='price']");
     const stockInput = document.querySelector("input[name='stock']");
-
     [priceInput, stockInput].forEach(input => {
         if (input) {
-            // フォーカス外れたときに変換
             input.addEventListener("blur", function() {
                 this.value = toHalfWidth(this.value);
             });
         }
     });
+
 });

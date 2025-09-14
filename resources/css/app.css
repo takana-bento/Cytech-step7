@@ -16,3 +16,8 @@ select {
         white-space: nowrap; /* 折り返し禁止 */
     }
 
+    .company-name-text {
+        display: inline-block;
+        vertical-align: middle;
+        white-space: nowrap; /* 折り返し禁止 */
+    }

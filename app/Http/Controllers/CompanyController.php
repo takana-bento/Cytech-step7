@@ -47,7 +47,7 @@ class CompanyController extends Controller
         $company = Company::findOrFail($id);
         $company->delete();
 
-        return redirect()->route('companies.index')
+        return redirect()->route('admin.companies.index')
                         ->with('success', '会社を削除しました');
     }
 }
