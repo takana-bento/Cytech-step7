@@ -43,9 +43,9 @@ Route::middleware('auth')->group(function () {
     // 会社管理
     // ------------------------------
     Route::prefix('admin')->group(function () {
-        Route::get('companies', [CompanyController::class, 'index'])->name('admin.companies.index');
-        Route::post('companies', [CompanyController::class, 'store'])->name('admin.companies.store');
-        Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('admin.companies.destroy');
+        Route::get('companies', [ProductController::class, 'companyIndex'])->name('admin.companies.index');
+        Route::post('companies', [ProductController::class, 'storeCompany'])->name('admin.companies.store');
+        Route::delete('companies/{company}', [ProductController::class, 'destroyCompany'])->name('admin.companies.destroy');
     });
 });
 require __DIR__ . '/auth.php';

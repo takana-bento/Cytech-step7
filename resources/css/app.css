@@ -21,3 +21,20 @@ select {
         vertical-align: middle;
         white-space: nowrap; /* 折り返し禁止 */
     }
+
+    .form__error {
+        height: 10px;
+        font-size: 0.9rem;
+        color: #ff0026;
+        line-height: 1.25rem;
+        margin-top: 1px;
+        visibility: hidden;
+    }
+    
+    .form__error:empty {
+        display: block; /* 高さを維持 */
+    }
+    
+    .form__error:not(:empty) {
+        visibility: visible;
+    }

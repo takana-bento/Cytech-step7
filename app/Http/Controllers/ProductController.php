@@ -8,6 +8,9 @@ use App\Models\Company;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\ProductRequest;
+use Illuminate\Support\Facades\DB;
+
 
 class ProductController extends Controller
 {
@@ -64,28 +67,28 @@ class ProductController extends Controller
      * @param Request $request
      * @return RedirectResponse
      */    
-    public function store(Request $request): RedirectResponse
+    public function store(ProductRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'product_name' => 'required|string|max:255',
-            'company_id' => 'required|exists:companies,id',
-            'price' => 'required|integer|min:0',
-            'stock' => 'required|integer|min:0',
-            'comment' => 'nullable|string',
-            'img_path' => 'nullable|image|max:2048',
-        ]);
+        DB::beginTransaction();
+        try {
+            $validated = $request->validated();
+    
+            if ($request->hasFile('img_path')) {
+                $validated['img_path'] = $request->file('img_path')->store('products', 'public');
+            }
+    
+            Product::create($validated);
 
-        // 画像ファイルを保存
-        if ($request->hasFile('img_path')) {
-            $validated['img_path'] = $request->file('img_path')->store('products', 'public');
+            DB::commit();
+            return redirect()->route('products.create')
+                            ->with('success', '商品を登録しました');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error($e->getMessage());
+            return redirect()->back()->with('error', '商品登録に失敗しました。');
         }
-
-        Product::create($validated);
-
-        return redirect()->route('products.create')
-                        ->with('success', '商品を登録しました');
     }
-
+    
     /**
      * 商品詳細画面を表示
      *
@@ -120,30 +123,30 @@ class ProductController extends Controller
      * @param int $id
      * @return RedirectResponse
      */    
-    public function update(Request $request, $id): RedirectResponse
+    public function update(ProductRequest $request, $id): RedirectResponse
     {
-        $validated = $request->validate([
-            'product_name' => 'required|string|max:255',
-            'company_id' => 'required|exists:companies,id',
-            'price' => 'required|integer|min:0',
-            'stock' => 'required|integer|min:0',
-            'comment' => 'nullable|string',
-            'img_path' => 'nullable|image|max:2048',
-        ]);
+        DB::beginTransaction();
+        try {
+            $validated = $request->validated();
+    
+            $product = Product::findOrFail($id);
+    
+            if ($request->hasFile('img_path')) {
+                $validated['img_path'] = $request->file('img_path')->store('products', 'public');
+            }
+    
+            $product->update($validated);
 
-        $product = Product::findOrFail($id);
-
-        // 画像ファイルを保存（新しい画像があれば更新）
-        if ($request->hasFile('img_path')) {
-            $validated['img_path'] = $request->file('img_path')->store('products', 'public');
+            DB::commit();
+            return redirect()->route('products.edit', $product->id)
+                            ->with('success', '商品情報を更新しました');
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error($e->getMessage());
+            return redirect()->back()->with('error', '商品更新に失敗しました。');
         }
-
-        $product->update($validated);
-
-        return redirect()->route('products.edit', $product->id)
-                        ->with('success', '商品情報を更新しました');
     }
-
+    
     /**
      * 商品を削除
      *
@@ -153,17 +156,23 @@ class ProductController extends Controller
      */
     public function destroy(Request $request, $id): RedirectResponse
     {
-        $product = Product::findOrFail($id);
-        $product->delete();
+        DB::beginTransaction();
+        try {
+            $product = Product::findOrFail($id);
+            $product->delete();
+    
+            $page = $request->input('page', 1);
 
-        // ページ番号を取得（デフォルト1）
-        $page = $request->input('page', 1);
-
-        // ページ番号付きでリダイレクト
-        return redirect()->route('products.index', ['page' => $page])
-                        ->with('success', '商品を削除しました');
+            DB::commit();
+            return redirect()->route('products.index', ['page' => $page])
+                            ->with('success', '商品を削除しました');
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error($e->getMessage());
+            return redirect()->back()->with('error', '商品削除に失敗しました。');
+        }
     }
-
+    
     /**
      * 商品画像を削除
      *
@@ -182,5 +191,67 @@ class ProductController extends Controller
         return redirect()
             ->route('products.edit', $product->id)
             ->with('success', '画像を削除しました');
+    }
+
+    /**
+     * 会社登録処理
+     *
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function storeCompany(Request $request): RedirectResponse
+    {
+        DB::beginTransaction();
+        $request->validate([
+            'company_name' => 'required|string|unique:companies,company_name',
+        ]);
+    
+        try {
+            Company::create([
+                'company_name' => $request->company_name,
+                'street_address' => $request->street_address,
+                'representative_name' => $request->representative_name,
+            ]);
+
+            DB::commit();
+            return redirect()->back()->with('success', '会社を登録しました');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error($e->getMessage());
+            return redirect()->back()->with('error', '会社登録に失敗しました');
+        }
+    }
+
+    /**
+     * 会社一覧画面を表示
+     *
+     * @return View
+     */
+    public function companyIndex(): View
+    {
+        $companies = Company::all();
+        $products = Product::with('company')->get();
+
+        return view('admin.companies.index', compact('companies', 'products'));
+    }
+
+    /**
+     * 会社削除処理
+     *
+     * @param Company $company
+     * @return RedirectResponse
+     */
+    public function destroyCompany(Company $company): RedirectResponse
+    {
+        DB::beginTransaction();
+        try {
+            $company->delete();
+            DB::commit();
+            return redirect()->back()->with('success', '会社を削除しました');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error($e->getMessage());
+            return redirect()->back()->with('error', '会社削除に失敗しました');
+        }
     }
 }

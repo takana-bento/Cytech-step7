@@ -19,86 +19,111 @@
                     @method('PUT')
 
                     <!-- 商品ID（表示のみ） -->
-                    <div class="flex items-center text-3xl mb-10 w-full">
+                    <div class="flex items-center text-3xl mb-6 w-full">
                         <span class="w-48 italic">ID.</span>
                         <span>{{ $product->id }}.</span>
                     </div>
 
                     <!-- 商品名 -->
-                    <div class="flex items-start text-3xl mb-10 w-full">
+                    <div class="flex items-start text-3xl mb-6 w-full">
                         <label class="w-48">
                             商品名
                             <span class="text-red-500 text-lg font-mono align-super">*</span>
                         </label>
-                        <input
-                            type="text"
-                            name="product_name"
-                            value="{{ $product->product_name }}" 
-                            class="border border-gray-400 rounded px-3 py-2 w-96 h-14"
-                            required
-                        >
+                        <div class="flex flex-col w-96">
+                            <input
+                                type="text"
+                                name="product_name"
+                                value="{{ old('product_name', $product->product_name) }}"
+                                class="border border-gray-400 rounded px-3 py-2 w-96 h-14"
+                            >
+                            <div class="form__error @if($errors->has('product_name')) visible @endif">
+                                @foreach ($errors->get('product_name') as $message)
+                                    {{ $message }}
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 会社名 -->
-                    <div class="flex items-start text-3xl mb-10 w-full">
+                    <div class="flex items-start text-3xl mb-6 w-full">
                         <label class="w-48">
-                            会社名
+                            メーカー名
                             <span class="text-red-500 text-lg font-mono align-super">*</span>
                         </label>
-                        <select
-                            name="company_id"
-                            class="border border-gray-400 rounded px-3 py-2 w-96 h-14"
-                        >
-                            @foreach ($companies as $company)
-                                <option value="{{ $company->id }}" 
-                                    {{ $company->id == $product->company_id ? 'selected' : '' }}
-                                >
-                                    {{ $company->company_name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <div class="flex flex-col w-96">
+                            <select
+                                name="company_id"
+                                class="border border-gray-400 rounded px-3 py-2 w-96 h-14"
+                            >
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}" 
+                                        {{ old('company_id', $product->company_id) == $company->id ? 'selected' : '' }}
+                                    >
+                                        {{ $company->company_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="form__error @if($errors->has('company_id')) visible @endif">
+                                @foreach ($errors->get('company_id') as $message)
+                                    {{ $message }}
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 価格 -->
-                    <div class="flex items-start text-3xl mb-10 w-full">
+                    <div class="flex items-start text-3xl mb-6 w-full">
                         <label class="w-48">
                             価格
                             <span class="text-red-500 text-lg font-mono align-super">*</span>
                         </label>
-                        <input
-                            type="number"
-                            name="price"
-                            value="{{ $product->price }}" 
-                            class="border border-gray-400 rounded px-3 py-2 w-96 h-14"
-                            required
-                        >
+                        <div class="flex flex-col w-96">
+                            <input
+                                type="number"
+                                name="price"
+                                value="{{ old('price', $product->price) }}"
+                                class="border border-gray-400 rounded px-3 py-2 w-96 h-14"
+                            >
+                            <div class="form__error @if($errors->has('price')) visible @endif">
+                                @foreach ($errors->get('price') as $message)
+                                    {{ $message }}
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 在庫数 -->
-                    <div class="flex items-start text-3xl mb-10 w-full">
+                    <div class="flex items-start text-3xl mb-6 w-full">
                         <label class="w-48">
                             在庫数
                             <span class="text-red-500 text-lg font-mono align-super">*</span>
                         </label>
-                        <input
-                            type="number"
-                            name="stock"
-                            value="{{ $product->stock }}" 
-                            class="border border-gray-400 rounded px-3 py-2 w-96 h-14"
-                            required
-                        >
+                        <div class="flex flex-col w-96">
+                            <input
+                                type="number"
+                                name="stock"
+                                value="{{ old('stock', $product->stock) }}"
+                                class="border border-gray-400 rounded px-3 py-2 w-96 h-14"
+                            >
+                            <div class="form__error @if($errors->has('stock')) visible @endif">
+                                @foreach ($errors->get('stock') as $message)
+                                    {{ $message }}
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
 
                     <!-- コメント -->
-                    <div class="flex items-start text-3xl mb-10 w-full">
+                    <div class="flex items-start text-3xl mb-6 w-full">
                         <label class="w-48">コメント</label>
                         <textarea
                             name="comment" 
-                            class="border border-gray-400 rounded px-3 py-2 w-96 min-h-[5.5rem]">{{ $product->comment }}</textarea>
+                            class="border border-gray-400 rounded px-3 py-2 w-96 min-h-[5.5rem]">{{ old('comment', $product->comment) }}</textarea>
                     </div>
 
                     <!-- 商品画像アップロード -->
-                    <div class="flex items-center text-3xl mb-16">
+                    <div class="flex items-center text-3xl mb-6">
                         <label class="w-48">商品画像</label>
                         <label class="cursor-pointer bg-gray-300 hover:bg-gray-500 text-gray-900  px-12 py-2 rounded-sm text-base">
                             ファイルを選択

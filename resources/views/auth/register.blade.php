@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="flex flex-col items-center justify-center min-h-screen">
         <!-- タイトル -->
-        <h1 class="text-2xl font-normal mb-6">ユーザー新規登録画面</h1>
+        <h1 class="text-2xl font-normal mb-2">ユーザー新規登録画面</h1>
 
         <form method="POST" action="{{ route('register') }}" class="w-96 space-y-12">
             @csrf
@@ -13,12 +13,15 @@
                     type="email" 
                     name="email" 
                     value="{{ old('email') }}" 
-                    required 
                     autofocus 
                     placeholder="アドレス"
                     class="w-full border px-3 py-1" 
                 />
-                <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                <div class="form__error @if($errors->has('email')) visible @endif">
+                    @foreach ($errors->get('email') as $message)
+                        {{ $message }}
+                    @endforeach
+                </div>
             </div>
 
             <!-- Password -->
@@ -27,11 +30,14 @@
                     id="password" 
                     type="password" 
                     name="password" 
-                    required 
                     placeholder="パスワード"
                     class="w-full border px-3 py-1" 
                 />
-                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                <div class="form__error @if($errors->has('password')) visible @endif">
+                    @foreach ($errors->get('password') as $message)
+                        {{ $message }}
+                    @endforeach
+                </div>
             </div>
 
             <!-- ボタン -->
