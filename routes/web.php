@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProductAdminController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,11 +21,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
 Route::middleware('auth')->group(function () {
 
     // ------------------------------
@@ -34,18 +30,24 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+
     // ------------------------------
     // 商品管理
     // ------------------------------
-    Route::resource('products', ProductController::class);
-
-    // ------------------------------
-    // 会社管理
-    // ------------------------------
-    Route::prefix('admin')->group(function () {
-        Route::get('companies', [ProductController::class, 'companyIndex'])->name('admin.companies.index');
-        Route::post('companies', [ProductController::class, 'storeCompany'])->name('admin.companies.store');
-        Route::delete('companies/{company}', [ProductController::class, 'destroyCompany'])->name('admin.companies.destroy');
-    });
+    // 商品一覧
+    Route::get('products', [ProductController::class, 'index'])->name('products.index');
+    // 商品作成
+    Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
+    // 商品保存
+    Route::post('products', [ProductController::class, 'store'])->name('products.store');
+    // 商品詳細
+    Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
+    // 商品編集
+    Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+    // 商品更新
+    Route::patch('products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::put('products/{product}', [ProductController::class, 'update']); // PUT用
+    // 商品削除
+    Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 });
 require __DIR__ . '/auth.php';

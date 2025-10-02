@@ -46,6 +46,7 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
     
         // ログインせず、ログイン画面へリダイレクト
+        Auth::logout();
         return redirect()->route('login')->with('success', '登録が完了しました。ログインしてください。');
     }
 }

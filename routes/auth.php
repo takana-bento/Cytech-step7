@@ -24,14 +24,11 @@ Route::middleware('guest')->group(function () {
         $data = $request->validated();
 
         $user = \App\Models\User::create([
-            'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
         ]);
 
-        \Illuminate\Support\Facades\Auth::login($user);
-
-        return redirect()->route('dashboard')->with('success', '登録が完了しました。');
+        return redirect()->route('login')->with('success', '登録が完了しました。ログインしてください。');
     });
 
     // ログインフォーム表示（既存）
@@ -44,7 +41,7 @@ Route::middleware('guest')->group(function () {
 
         if (\Illuminate\Support\Facades\Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended(route('dashboard'))
+            return redirect()->route('products.index')
                 ->with('success', 'ログインしました。');
         }
 

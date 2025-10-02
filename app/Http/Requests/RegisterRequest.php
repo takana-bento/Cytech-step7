@@ -15,7 +15,6 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', Password::defaults()],
         ];
@@ -24,8 +23,6 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => '名前は必須です。',
-            'name.max' => '名前は255文字以内で入力してください。',
             'email.required' => 'メールアドレスは必須です。',
             'email.email' => '有効なメールアドレスを入力してください。',
             'email.unique' => 'このメールアドレスは既に登録されています。',
