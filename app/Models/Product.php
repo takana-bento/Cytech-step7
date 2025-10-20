@@ -20,6 +20,16 @@ class Product extends Model
     }
 
     /**
+     * この商品に属する販売情報を取得
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function sales()
+    {
+        return $this->hasMany(Sale::class);
+    }
+
+    /**
      * 一括代入可能なカラム
      *
      * @var array

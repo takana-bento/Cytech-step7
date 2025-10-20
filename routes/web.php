@@ -6,6 +6,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProductAdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\SalesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::post('/purchase', [SalesController::class, 'purchase']);
 
     // ------------------------------
     // 商品管理
@@ -40,6 +42,8 @@ Route::middleware('auth')->group(function () {
     Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
     // 商品保存
     Route::post('products', [ProductController::class, 'store'])->name('products.store');
+    // 商品検索
+    Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
     // 商品詳細
     Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
     // 商品編集
@@ -50,4 +54,8 @@ Route::middleware('auth')->group(function () {
     // 商品削除
     Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 });
+
+    // API
+    Route::post('/purchase', [SalesController::class, 'purchase']);
+
 require __DIR__ . '/auth.php';

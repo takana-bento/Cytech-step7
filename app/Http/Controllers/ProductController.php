@@ -88,7 +88,76 @@ class ProductController extends Controller
             return redirect()->back()->with('error', '商品登録に失敗しました。');
         }
     }
+
+
+    /**
+     * 商品を検索（Ajax用）
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function search(Request $request)
+    {
+        $keyword = $request->input('keyword');
+        $companyId = $request->input('company_id');
+        $sortColumn = $request->input('sort_column', 'id');  // デフォルトid
+        $sortDirection = $request->input('sort_direction', 'desc'); // デフォルト降順
+
+        $query = Product::with('company');
     
+        // 🔹キーワード検索
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('product_name', 'like', "%{$keyword}%")
+                ->orWhereHas('company', function ($q2) use ($keyword) {
+                    $q2->where('company_name', 'like', "%{$keyword}%");
+                });
+            });
+        }
+
+        // 🔹会社での絞り込み
+        if (!empty($companyId)) {
+            $query->where('company_id', $companyId);
+        }
+
+        // 💰 価格範囲
+        if ($request->filled('price_min') && is_numeric($request->price_min)) {
+            $query->where('price', '>=', (int)$request->price_min);
+        }
+        if ($request->filled('price_max') && is_numeric($request->price_max)) {
+            $query->where('price', '<=', (int)$request->price_max);
+        }
+
+        // 📦 在庫範囲
+        if ($request->filled('stock_min') && is_numeric($request->stock_min)) {
+            $query->where('stock', '>=', (int)$request->stock_min);
+        }
+        if ($request->filled('stock_max') && is_numeric($request->stock_max)) {
+            $query->where('stock', '<=', (int)$request->stock_max);
+        }
+
+        // ソート処理追加        
+        $query->orderBy($sortColumn, $sortDirection);
+        
+        // 🔹ページネーション実行
+        $products = $query->paginate(7)->appends($request->all());
+        
+        // 🔹部分ビュー生成
+        $html = view('products.table_rows', compact('products'))->render();
+
+        // 🔹ページネーション部分（ビューがなければ空文字）
+        try {
+            $pagination = $products->links('vendor.pagination.tailwind')->toHtml();
+        } catch (\Throwable $e) {
+            $pagination = '';
+        }
+    
+        return response()->json([
+            'html' => $html,
+            'pagination' => $pagination,
+        ]);
+    }
+        
     /**
      * 商品詳細画面を表示
      *

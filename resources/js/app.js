@@ -1,6 +1,7 @@
 import './bootstrap';
 import Alpine from 'alpinejs';
 import '../css/products.css';
+import './products.js';
 
 window.Alpine = Alpine;
 Alpine.start();
@@ -63,4 +64,56 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+});
+
+$(document).on('click', '#searchBtn', function() {
+    let keyword = $('#keyword').val();
+
+    $.ajax({
+        url: '/products/search', // Controller の検索用ルート
+        type: 'GET',
+        data: {
+            keyword: $('#keyword').val(),
+            category: $('#category').val(),
+            price_min: $('#price_min').val(),
+            price_max: $('#price_max').val(),
+            stock_min: $('#stock_min').val(),
+            stock_max: $('#stock_max').val()
+        },
+                success: function(data) {
+            console.log(data); // 確認用
+            $('#productTable tbody').html(data.html);
+            $('#pagination').html(data.pagination);
+        },
+        error: function() {
+            console.log('検索に失敗しました');
+        }
+    });
+
+    // --- 削除フォーム ---
+    $(document).on('submit', '.deleteProductForm', function(e) {
+        e.preventDefault(); // 通常のフォーム送信を止める
+    
+        if (!confirm('本当に削除しますか？')) return;
+    
+        const form = $(this);
+        const url = form.attr('action');
+        const token = form.find('input[name="_token"]').val();
+    
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                _method: 'DELETE',
+                _token: token,
+            },
+            success: function(response) {
+                // 削除した行を非表示
+                form.closest('tr').fadeOut();
+            },
+            error: function(xhr) {
+                alert('削除に失敗しました');
+            }
+        });
+    });    
 });
